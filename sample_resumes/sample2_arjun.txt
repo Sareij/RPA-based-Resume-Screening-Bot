@@ -1,0 +1,26 @@
+Arjun Venkatesh
+arjun.v@gmail.com | +91 8765432109
+
+EDUCATION
+B.E. Information Technology — VIT Vellore | CGPA: 7.2 | 2023
+
+TECHNICAL SKILLS
+JavaScript, React, Node.js, Express.js, MongoDB, HTML5, CSS3,
+Bootstrap, REST APIs, Git, GitHub, Postman
+
+PROJECTS
+1. E-Commerce Web Application (React + Node.js + MongoDB)
+   - Built full-stack shopping platform with cart and payment integration
+   - Implemented JWT authentication and REST APIs
+2. Portfolio Website using React and Tailwind CSS
+3. Real-time Chat App using Socket.io
+
+INTERNSHIP
+Frontend Developer Intern — Infosys BPM (Mar 2023 – Aug 2023)
+- Developed responsive UI components using React and Bootstrap
+- Integrated REST APIs and implemented state management with Redux
+
+CERTIFICATIONS
+- Web Development Bootcamp — Udemy
+
+LANGUAGES: English, Tamil

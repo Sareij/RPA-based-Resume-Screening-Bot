@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Upload Resumes{% endblock %}
+{% block content %}
+
+<div class="step-bar rounded overflow-hidden mb-4">
+  <div class="step-item done">① Job Description ✓</div>
+  <div class="step-item active">② Upload Resumes</div>
+  <div class="step-item">③ View Results</div>
+</div>
+
+{% if store %}
+<!-- JD Summary Card -->
+<div class="card p-3 mb-4" style="background:var(--navy);">
+  <div class="row align-items-center">
+    <div class="col-md-6">
+      <div class="fw-bold text-white">{{ store.jd.title }}</div>
+      <div style="color:rgba(255,255,255,.6);font-size:.82rem;">{{ store.jd.role_category }} &nbsp;·&nbsp; {{ store.jd.experience_level }}</div>
+    </div>
+    <div class="col-md-4 mt-2 mt-md-0">
+      <div style="font-size:.78rem;color:rgba(255,255,255,.5);">Required skills:</div>
+      <div class="d-flex flex-wrap gap-1 mt-1">
+        {% for sk in store.jd.required_skills[:5] %}
+        <span class="badge" style="background:rgba(13,148,136,.3);color:#5EEAD4;font-size:.7rem;">{{ sk }}</span>
+        {% endfor %}
+        {% if store.jd.required_skills|length > 5 %}
+        <span class="badge" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:.7rem;">+{{ store.jd.required_skills|length - 5 }} more</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-2 mt-2 mt-md-0 text-md-end">
+      {% if store.blind_mode %}
+      <span class="badge px-2 py-1" style="background:#0D9488;font-size:.75rem;">
+        <i class="fas fa-eye-slash me-1"></i>Blind Mode ON
+      </span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <h4 class="fw-bold mb-1" style="color:var(--navy);"><i class="fas fa-upload me-2" style="color:var(--teal);"></i>Upload Candidate Resumes</h4>
+      <p class="text-muted mb-4" style="font-size:.85rem;">Upload multiple resumes at once. Supported: PDF, DOCX, DOC, PNG, JPG</p>
+
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-4">
+          <div class="border-2 border-dashed rounded p-5 text-center"
+               style="border-style:dashed !important;border-color:#CBD5E1 !important;background:#F8FAFC;cursor:pointer;"
+               onclick="document.getElementById('resume-input').click()">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color:#CBD5E1;"></i>
+            <div class="fw-semibold" style="color:var(--slate);">Click to select resumes or drag & drop</div>
+            <div class="text-muted mt-1" style="font-size:.8rem;">PDF, DOCX, PNG, JPG — Multiple files allowed</div>
+            <div id="file-count" class="mt-2" style="font-size:.82rem;color:var(--teal);"></div>
+          </div>
+          <input type="file" id="resume-input" name="resumes" multiple
+                 accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" class="d-none"
+                 onchange="showFileCount(this)">
+        </div>
+
+        <button type="submit" class="btn btn-lg w-100 fw-bold py-2" style="background:var(--teal);color:#fff;border-radius:8px;">
+          <i class="fas fa-brain me-2"></i>Process Resumes with AI
+        </button>
+      </form>
+    </div>
+
+    {% if store and store.candidates %}
+    <div class="card p-3 mt-3">
+      <div class="fw-bold mb-2" style="color:var(--navy);">
+        <i class="fas fa-check-circle me-2" style="color:var(--teal);"></i>
+        {{ store.candidates|length }} resume(s) already processed
+      </div>
+      {% for cand in store.candidates %}
+      <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+        <span style="font-size:.82rem;">{{ cand.parsed_resume.name }}</span>
+        <span class="badge" style="background:#D1FAE5;color:#065F46;">{{ cand.match_result.overall_score }}%</span>
+      </div>
+      {% endfor %}
+      <div class="mt-3">
+        <a href="{{ url_for('main.results') }}" class="btn w-100" style="background:var(--navy);color:#fff;border-radius:8px;">
+          <i class="fas fa-chart-bar me-2"></i>View Results
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-5 mt-3 mt-lg-0">
+    <div class="card p-3 mb-3">
+      <h6 class="fw-bold" style="color:var(--navy);">Processing Pipeline</h6>
+      <div class="mt-2">
+        {% for step, color in [
+          ('OCR text extraction','#0D9488'),
+          ('Semantic NLP parsing','#7C3AED'),
+          ('Bias signal detection','#F97316'),
+          ('JD skills matching','#0D1B3E'),
+          ('Growth potential scoring','#F59E0B'),
+          ('Fraud risk analysis','#991B1B'),
+          ('Explainable AI ranking','#0D9488'),
+        ] %}
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="width:8px;height:8px;border-radius:50%;background:{{ color }};flex-shrink:0;"></div>
+          <span style="font-size:.82rem;color:var(--slate);">{{ step }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card p-3" style="border-left:4px solid var(--gold);">
+      <h6 class="fw-bold" style="color:var(--navy);">Tips for Best Results</h6>
+      <ul class="list-unstyled mt-2 mb-0" style="font-size:.79rem;color:var(--slate-l);">
+        <li class="mb-1">• Use text-based PDFs when possible (not scanned images)</li>
+        <li class="mb-1">• DOCX files give the best text extraction quality</li>
+        <li class="mb-1">• Upload 3+ resumes to see clustering in action</li>
+        <li class="mb-1">• Include GitHub/LinkedIn URLs in resumes for better scoring</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function showFileCount(input) {
+  const count = input.files.length;
+  document.getElementById('file-count').textContent =
+    count > 0 ? `${count} file(s) selected` : '';
+}
+</script>
+{% endblock %}

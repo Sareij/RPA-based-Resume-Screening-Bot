@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Home — CHIS{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<div class="row align-items-center py-4">
+  <div class="col-lg-7">
+    
+    <h1 class="fw-bold" style="font-size:2.4rem;line-height:1.2;color:var(--navy);">
+      Cognitive Hiring<br>Intelligence System
+    </h1>
+    <p class="lead mt-3" style="color:var(--slate);">
+      Not just screening resumes — <strong>understanding candidates</strong>,
+      <strong>removing bias</strong>, <strong>predicting potential</strong>,
+      and explaining every hiring decision.
+    </p>
+    <div class="d-flex gap-3 mt-4 flex-wrap">
+      <a href="{{ url_for('main.setup') }}" class="btn btn-lg px-4"
+         style="background:var(--teal);color:#fff;border-radius:8px;">
+        <i class="fas fa-play me-2"></i>Start Screening
+      </a>
+      <a href="#features" class="btn btn-lg btn-outline-secondary px-4" style="border-radius:8px;">
+        <i class="fas fa-info-circle me-2"></i>Learn More
+      </a>
+    </div>
+  </div>
+  <div class="col-lg-5 mt-4 mt-lg-0">
+    <div class="card p-3" style="background:var(--navy);border-radius:16px;">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="score-badge score-high" style="width:48px;height:48px;font-size:.9rem;">92</div>
+        <div>
+          <div class="fw-bold text-white">Candidate #1 — Ranked #1 of 24</div>
+          <div style="color:rgba(255,255,255,.6);font-size:.8rem;">Skills match · Bias-free · Explainable</div>
+        </div>
+      </div>
+      {% for label, val, color in [('Skills match','92%','#0D9488'),('Experience','85%','#7C3AED'),('Growth potential','88%','#F59E0B')] %}
+      <div class="mb-2">
+        <div class="d-flex justify-content-between mb-1">
+          <span style="color:rgba(255,255,255,.7);font-size:.78rem;">{{ label }}</span>
+          <span style="color:{{ color }};font-size:.78rem;font-weight:700;">{{ val }}</span>
+        </div>
+        <div class="progress" style="height:5px;background:rgba(255,255,255,.1);">
+          <div class="progress-bar" style="width:{{ val }};background:{{ color }};"></div>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="mt-3 pt-2" style="border-top:1px solid rgba(255,255,255,.1);">
+        <span style="color:#0D9488;font-size:.78rem;"><i class="fas fa-check-circle me-1"></i>Bias-free mode ON</span>
+        <span class="ms-3" style="color:#F59E0B;font-size:.78rem;"><i class="fas fa-shield-alt me-1"></i>Low fraud risk</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats row -->
+<div class="row g-3 my-3">
+  {% for num, label, icon, color in [
+    ('7','AI Features Built','fas fa-brain','#0D9488'),
+    ('3','Pipeline Layers','fas fa-layer-group','#7C3AED'),
+    ('100%','Explainable Decisions','fas fa-eye','#F59E0B'),
+    ('0','Bias in Blind Mode','fas fa-balance-scale','#F97316')
+  ] %}
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <i class="{{ icon }} fa-lg mb-2" style="color:{{ color }};"></i>
+      <div class="stat-num" style="color:{{ color }};">{{ num }}</div>
+      <div class="stat-lbl">{{ label }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Features -->
+<div id="features" class="mt-4">
+  <h4 class="fw-bold mb-3" style="color:var(--navy);">What CHIS Does</h4>
+  <div class="row g-3">
+    {% set features = [
+      ('fas fa-file-alt','#0D9488','OCR + Semantic NLP Parsing','Extracts skills contextually from PDF, DOCX, or image resumes — understands meaning, not just keywords.','Core'),
+      ('fas fa-balance-scale','#F97316','Bias Detection & Blind Mode','Detects name/gender/college/age bias signals. Toggle blind screening for fair evaluation.','⭐ Star Feature'),
+      ('fas fa-chart-bar','#7C3AED','Explainable AI Ranking','Every candidate is ranked with a detailed WHY — strengths, weaknesses, missing skills.','Advanced'),
+      ('fas fa-briefcase','#0D1B3E','JD Auto-Parsing','Upload any job description — CHIS extracts required skills, experience level, and role category automatically.','Core'),
+      ('fas fa-users','#0D9488','Smart Clustering','Groups candidates into talent clusters: AI Specialists, Backend Devs, High-Potential Freshers, etc.','ML'),
+      ('fas fa-trending-up','#F59E0B','Growth Potential Score','Predicts future potential from certifications, GitHub, project diversity — not just current skills.','Unique'),
+      ('fas fa-shield-alt','#991B1B','Fraud Detection','Flags exaggerated skills, impossible timelines, and suspicious skill combinations.','Security'),
+      ('fas fa-robot','#7C3AED','UiPath RPA Integration','Bot automates resume collection, folder routing, and pipeline triggering.','RPA'),
+    ] %}
+    {% for icon, color, title, desc, tag in features %}
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 p-3">
+        <div class="d-flex align-items-start gap-3">
+          <div style="width:38px;height:38px;border-radius:8px;background:{{ color }}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="{{ icon }}" style="color:{{ color }};font-size:.95rem;"></i>
+          </div>
+          <div>
+            <div class="fw-bold" style="font-size:.9rem;color:var(--navy);">{{ title }}</div>
+            <div style="font-size:.78rem;color:var(--slate-l);margin-top:4px;line-height:1.5;">{{ desc }}</div>
+            <span class="badge mt-2" style="background:{{ color }}22;color:{{ color }};font-size:.7rem;">{{ tag }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- How to use -->
+<div class="card mt-4 p-4">
+  <h5 class="fw-bold mb-3" style="color:var(--navy);"><i class="fas fa-route me-2" style="color:var(--teal);"></i>How to Use CHIS</h5>
+  <div class="row g-3 text-center">
+    {% for step, title, desc in [
+      ('1','Setup Job','Paste your job description and toggle bias-free mode'),
+      ('2','Upload Resumes','Upload PDF/DOCX/image resumes — any quantity'),
+      ('3','AI Processing','CHIS parses, scores, clusters, and analyses all candidates'),
+      ('4','View Results','See ranked candidates with full XAI explanations'),
+    ] %}
+    <div class="col-6 col-md-3">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;margin:0 auto .75rem;">{{ step }}</div>
+      <div class="fw-bold" style="font-size:.85rem;color:var(--navy);">{{ title }}</div>
+      <div style="font-size:.75rem;color:var(--slate-l);">{{ desc }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="text-center mt-3">
+    <a href="{{ url_for('main.setup') }}" class="btn px-5 py-2" style="background:var(--teal);color:#fff;border-radius:8px;font-weight:600;">
+      <i class="fas fa-rocket me-2"></i>Get Started
+    </a>
+  </div>
+</div>
+
+{% endblock %}

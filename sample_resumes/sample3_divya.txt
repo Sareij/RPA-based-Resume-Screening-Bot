@@ -1,0 +1,27 @@
+Divya Krishnaswamy
+divya.k@yahoo.com | linkedin.com/in/divyak | github.com/divya-dev
+
+OBJECTIVE
+Motivated fresher seeking Software Developer role to apply Python and ML skills.
+
+EDUCATION
+B.Sc Computer Science — Loyola College, Chennai | CGPA: 9.1 | 2024
+
+SKILLS
+Python, C, C++, Java, SQL, Machine Learning basics, HTML, CSS, Git
+
+ACADEMIC PROJECTS
+1. Fake News Detection System — Python + Naive Bayes + TF-IDF
+2. Student Result Management System — Java + MySQL
+3. Simple Chatbot — Python + NLTK
+
+CERTIFICATIONS
+- Python for Everybody — Coursera
+- NPTEL: Programming in Java
+- HackerRank Python (5 stars)
+
+ACHIEVEMENTS
+- Department rank 1 in final year
+- Participated in Smart India Hackathon 2023
+
+LANGUAGES: English, Tamil, Hindi

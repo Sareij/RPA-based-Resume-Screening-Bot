@@ -1,0 +1,27 @@
+Priya Sharma
+priya.sharma@email.com | +91 9876543210 | linkedin.com/in/priyasharma | github.com/priya-sharma
+
+EDUCATION
+B.Tech Computer Science — Anna University, Chennai | CGPA: 8.7 | 2022
+
+SKILLS
+Python, Machine Learning, Deep Learning, NLP, TensorFlow, PyTorch, scikit-learn,
+pandas, numpy, Flask, SQL, PostgreSQL, Docker, Git, Linux
+
+EXPERIENCE
+Data Science Intern — TCS, Chennai (Jan 2022 – Jun 2022)
+- Built ML model using scikit-learn for customer churn prediction (85% accuracy)
+- Developed NLP pipeline using NLTK and spaCy for sentiment analysis
+- Deployed model using Flask REST API on AWS EC2
+
+PROJECTS
+1. Resume Screening System using NLP and Python (Final Year Project)
+2. Sentiment Analysis on Twitter Data using BERT
+3. Customer Churn Prediction using XGBoost
+
+CERTIFICATIONS
+- Machine Learning by Andrew Ng — Coursera
+- AWS Cloud Practitioner — Amazon
+- Deep Learning Specialization — Coursera
+
+LANGUAGES: English, Tamil, Hindi

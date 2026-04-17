@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Setup Job Description{% endblock %}
+{% block content %}
+
+<div class="step-bar rounded overflow-hidden mb-4">
+  <div class="step-item active">① Job Description</div>
+  <div class="step-item">② Upload Resumes</div>
+  <div class="step-item">③ View Results</div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <h4 class="fw-bold mb-1" style="color:var(--navy);"><i class="fas fa-file-alt me-2" style="color:var(--teal);"></i>Job Description Setup</h4>
+      <p class="text-muted mb-4" style="font-size:.85rem;">Paste any job description below — CHIS will automatically extract required skills, experience level, and role category.</p>
+
+      <form method="POST">
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Job Description Text <span class="text-danger">*</span></label>
+          <textarea name="jd_text" class="form-control" rows="14" placeholder="Paste full job description here...
+
+Example:
+We are looking for a Python Backend Developer with 2+ years of experience.
+
+Requirements:
+- Proficient in Python, Django, Flask
+- Experience with SQL/PostgreSQL databases
+- Knowledge of REST APIs and Docker
+- Git version control
+
+Preferred:
+- AWS or Azure cloud experience
+- CI/CD pipeline knowledge
+
+Responsibilities:
+- Build and maintain backend services
+- Design REST APIs
+- Collaborate with frontend team" required></textarea>
+          <div class="form-text">Tip: Include Requirements, Preferred, and Responsibilities sections for best parsing.</div>
+        </div>
+
+        <div class="mb-4 p-3 rounded" style="background:#F0FDF4;border:1px solid #A7F3D0;">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="blind_mode" id="blind_mode" checked>
+            <label class="form-check-label fw-semibold" for="blind_mode">
+              <i class="fas fa-balance-scale me-2" style="color:var(--teal);"></i>Enable Bias-Free Blind Screening
+            </label>
+          </div>
+          <div class="mt-2" style="font-size:.82rem;color:var(--slate-l);padding-left:1.8rem;">
+            Masks candidate name, email, phone, and college name. Evaluates only skills, experience, and technical merit. Recommended for fair hiring.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-lg w-100 fw-bold py-2" style="background:var(--teal);color:#fff;border-radius:8px;">
+          <i class="fas fa-cogs me-2"></i>Parse Job Description & Continue
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4 mt-3 mt-lg-0">
+    <div class="card p-3 mb-3" style="border-left:4px solid var(--teal);">
+      <h6 class="fw-bold" style="color:var(--navy);">What CHIS Extracts</h6>
+      <ul class="list-unstyled mt-2 mb-0" style="font-size:.82rem;color:var(--slate);">
+        {% for item in ['Role category & job title','Required skills (semantic)','Preferred / nice-to-have skills','Experience level required','Key responsibilities'] %}
+        <li class="mb-1"><i class="fas fa-check-circle me-2" style="color:var(--teal);"></i>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card p-3" style="border-left:4px solid var(--gold);">
+      <h6 class="fw-bold" style="color:var(--navy);">Blind Mode Masks</h6>
+      <ul class="list-unstyled mt-2 mb-0" style="font-size:.82rem;color:var(--slate);">
+        {% for item in ['Candidate name','Email & phone number','College/university name','Gender signals (he/she)','Age & marital status','Photo mentions'] %}
+        <li class="mb-1"><i class="fas fa-eye-slash me-2" style="color:var(--gold);"></i>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

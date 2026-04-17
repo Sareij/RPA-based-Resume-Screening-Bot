@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIS — {% block title %}Cognitive Hiring Intelligence System{% endblock %}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy:   #0D1B3E;
+    --teal:   #0D9488;
+    --teal-l: #CCFBF1;
+    --gold:   #F59E0B;
+    --coral:  #F97316;
+    --purple: #7C3AED;
+    --slate:  #334155;
+    --slate-l:#64748B;
+  }
+  body { background: #F8FAFC; font-family: 'Segoe UI', system-ui, sans-serif; color: #1E293B; }
+
+  /* Navbar */
+  .navbar { background: var(--navy) !important; border-bottom: 3px solid var(--teal); }
+  .navbar-brand { color: #fff !important; font-weight: 700; font-size: 1.2rem; letter-spacing: .5px; }
+  .navbar-brand span { color: var(--teal); }
+  .nav-link { color: rgba(255,255,255,.75) !important; }
+  .nav-link:hover, .nav-link.active { color: var(--teal) !important; }
+
+  /* Cards */
+  .card { border: none; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card-header { border-radius: 12px 12px 0 0 !important; }
+
+  /* Score badge */
+  .score-badge { display: inline-flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; border-radius: 50%; font-size: 1rem; font-weight: 700; }
+  .score-high   { background: #D1FAE5; color: #065F46; }
+  .score-mid    { background: #FEF3C7; color: #92400E; }
+  .score-low    { background: #FEE2E2; color: #991B1B; }
+
+  /* Progress bars */
+  .progress { height: 8px; border-radius: 4px; background: #E2E8F0; }
+  .progress-bar { border-radius: 4px; }
+
+  /* Stat card */
+  .stat-card { background: #fff; border-radius: 10px; padding: 1rem 1.2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07); text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 700; }
+  .stat-lbl { font-size: .75rem; color: var(--slate-l); margin-top: 2px; }
+
+  /* Feature pill */
+  .feature-pill { display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px; font-size: .78rem; font-weight: 500; margin: 3px; }
+
+  /* Rank number */
+  .rank-num { width: 36px; height: 36px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-weight: 700; font-size: .9rem; }
+  .rank-1 { background: #FEF3C7; color: #B45309; }
+  .rank-2 { background: #E5E7EB; color: #374151; }
+  .rank-3 { background: #FEE2E2; color: #9A3412; }
+  .rank-other { background: #F1F5F9; color: var(--slate); }
+
+  /* Bias level */
+  .bias-badge { font-size: .72rem; padding: 2px 10px; border-radius: 12px; font-weight: 600; }
+
+  /* Steps progress */
+  .step-bar { display: flex; gap: 0; margin-bottom: 2rem; }
+  .step-item { flex: 1; padding: .5rem .8rem; font-size: .8rem; font-weight: 600;
+    text-align: center; background: #E2E8F0; color: var(--slate-l); position: relative; }
+  .step-item.active { background: var(--teal); color: #fff; }
+  .step-item.done   { background: #D1FAE5; color: #065F46; }
+
+  /* XAI explanation box */
+  .xai-box { background: #F0FDF4; border-left: 4px solid var(--teal);
+    border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; }
+
+  /* Cluster badge */
+  .cluster-badge { padding: 3px 10px; border-radius: 8px; font-size: .72rem; font-weight: 600;
+    background: var(--teal-l); color: #0F6E56; }
+
+  /* Footer */
+  footer { background: var(--navy); color: rgba(255,255,255,.5); padding: 1.2rem 0;
+    font-size: .8rem; margin-top: 3rem; }
+
+  /* Blind mode banner */
+  .blind-banner { background: linear-gradient(90deg, #0D9488, #0D1B3E);
+    color: #fff; padding: .5rem 1rem; border-radius: 8px; font-size: .85rem; }
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+      <i class="fas fa-brain me-2"></i>C<span>HIS</span>
+    </a>
+    <div class="navbar-nav ms-auto d-flex flex-row gap-3">
+      <a class="nav-link" href="{{ url_for('main.setup') }}"><i class="fas fa-file-alt me-1"></i>New Job</a>
+      <a class="nav-link" href="{{ url_for('main.upload_resumes') }}"><i class="fas fa-upload me-1"></i>Upload</a>
+      <a class="nav-link" href="{{ url_for('main.results') }}"><i class="fas fa-chart-bar me-1"></i>Results</a>
+      <a class="nav-link" href="{{ url_for('main.reset') }}"><i class="fas fa-redo me-1"></i>Reset</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+
+<footer>
+  <div class="container text-center">
+    CHIS — Cognitive Hiring Intelligence System &nbsp;|&nbsp; Dept. of Computer Science
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Results — CHIS Dashboard{% endblock %}
+{% block content %}
+
+<div class="step-bar rounded overflow-hidden mb-4">
+  <div class="step-item done">① Job Description ✓</div>
+  <div class="step-item done">② Upload Resumes ✓</div>
+  <div class="step-item active">③ Results Dashboard</div>
+</div>
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+  <div>
+    <h4 class="fw-bold mb-1" style="color:var(--navy);">
+      <i class="fas fa-chart-bar me-2" style="color:var(--teal);"></i>Screening Results
+    </h4>
+    <div style="font-size:.85rem;color:var(--slate-l);">{{ jd.title }} &nbsp;·&nbsp; {{ jd.role_category }} &nbsp;·&nbsp; {{ total }} candidates</div>
+  </div>
+  <div class="d-flex gap-2">
+    {% if blind_mode %}
+    <span class="blind-banner"><i class="fas fa-eye-slash me-1"></i>Blind Mode Active</span>
+    {% endif %}
+    <a href="{{ url_for('main.export_json') }}" class="btn btn-sm" style="background:var(--navy);color:#fff;border-radius:6px;">
+      <i class="fas fa-download me-1"></i>Export JSON
+    </a>
+    <a href="{{ url_for('main.upload_resumes') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-plus me-1"></i>Add More
+    </a>
+  </div>
+</div>
+
+<!-- Summary Stats -->
+<div class="row g-3 mb-4">
+  {% set avg_score = (ranked | map(attribute='match_result.overall_score') | list | sum / total) | round(1) %}
+  {% set shortlisted = ranked | selectattr('match_result.overall_score', '>=', 60) | list | length %}
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--teal);">{{ total }}</div>
+      <div class="stat-lbl">Total Candidates</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--teal);">{{ shortlisted }}</div>
+      <div class="stat-lbl">Shortlisted (≥60%)</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--navy);">{{ avg_score }}</div>
+      <div class="stat-lbl">Avg Match Score</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--coral);">{{ ranked[0].match_result.overall_score }}</div>
+      <div class="stat-lbl">Top Score</div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts row -->
+<div class="row g-3 mb-4">
+  <div class="col-md-5">
+    <div class="card p-3 h-100">
+      <h6 class="fw-bold mb-3" style="color:var(--navy);">Score Distribution</h6>
+      <canvas id="scoreChart" height="160"></canvas>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card p-3 h-100">
+      <h6 class="fw-bold mb-3" style="color:var(--navy);">Talent Pool Clusters</h6>
+      <div class="row g-2">
+        {% for cluster_name, info in clusters.items() %}
+        <div class="col-6">
+          <div class="p-2 rounded" style="background:#F8FAFC;border:1px solid #E2E8F0;">
+            <div class="fw-semibold" style="font-size:.78rem;color:var(--navy);">{{ cluster_name }}</div>
+            <div style="font-size:.72rem;color:var(--slate-l);">{{ info.count }} candidate(s) · avg {{ info.avg_score }}%</div>
+            <div class="d-flex flex-wrap gap-1 mt-1">
+              {% for m in info.members[:2] %}
+              <span style="font-size:.68rem;color:var(--teal);">{{ m }}</span>{% if not loop.last %},{% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ranked Candidates -->
+<div class="card">
+  <div class="card-header py-3 px-4" style="background:var(--navy);">
+    <div class="fw-bold text-white"><i class="fas fa-trophy me-2" style="color:var(--gold);"></i>Ranked Candidates — Explainable AI Decisions</div>
+  </div>
+  <div class="card-body p-0">
+    {% for cand in ranked %}
+    {% set pr   = cand.parsed_resume %}
+    {% set mr   = cand.match_result %}
+    {% set exp  = cand.explanation %}
+    {% set rank = cand.rank %}
+    {% set bs   = cand.bias_summary %}
+    {% set gr   = cand.growth %}
+    {% set fr   = cand.fraud %}
+
+    {% set score_class = 'score-high' if mr.overall_score >= 70 else ('score-mid' if mr.overall_score >= 50 else 'score-low') %}
+
+    <div class="p-4 {% if not loop.last %}border-bottom{% endif %} {% if mr.overall_score >= 60 %}{% endif %}">
+      <div class="row align-items-start">
+        <!-- Rank + Score -->
+        <div class="col-auto text-center">
+          <div class="rank-num {{ 'rank-1' if rank==1 else ('rank-2' if rank==2 else ('rank-3' if rank==3 else 'rank-other')) }} mb-2">
+            #{{ rank }}
+          </div>
+          <div class="score-badge {{ score_class }}">{{ mr.overall_score|int }}</div>
+        </div>
+
+        <!-- Main info -->
+        <div class="col">
+          <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+            <span class="fw-bold" style="font-size:1rem;color:var(--navy);">
+              {% if blind_mode %}[ MASKED ]{% else %}{{ pr.name }}{% endif %}
+            </span>
+            <span class="cluster-badge">{{ cand.get('cluster','—') }}</span>
+            {% if mr.overall_score >= 60 %}
+            <span class="badge" style="background:#D1FAE5;color:#065F46;font-size:.7rem;">Shortlisted</span>
+            {% endif %}
+            {% if rank == 1 %}
+            <span class="badge" style="background:#FEF3C7;color:#B45309;font-size:.7rem;"><i class="fas fa-star me-1"></i>Top Candidate</span>
+            {% endif %}
+          </div>
+
+          <!-- Sub info -->
+          <div class="d-flex flex-wrap gap-3 mb-2" style="font-size:.78rem;color:var(--slate-l);">
+            {% if not blind_mode and pr.email %}
+            <span><i class="fas fa-envelope me-1"></i>{{ pr.email }}</span>
+            {% endif %}
+            <span><i class="fas fa-clock me-1"></i>{{ pr.experience_years }} yrs exp</span>
+            <span><i class="fas fa-graduation-cap me-1"></i>{{ pr.education.degree or 'N/A' }}</span>
+            {% if pr.education.cgpa %}
+            <span><i class="fas fa-star me-1"></i>CGPA {{ pr.education.cgpa }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Skills -->
+          <div class="mb-2">
+            {% for sk in pr.skills[:8] %}
+            <span class="feature-pill" style="background:#F0FDF4;color:#065F46;border:1px solid #A7F3D0;">{{ sk }}</span>
+            {% endfor %}
+            {% if pr.skills|length > 8 %}
+            <span class="feature-pill" style="background:#F1F5F9;color:var(--slate-l);">+{{ pr.skills|length - 8 }} more</span>
+            {% endif %}
+          </div>
+
+          <!-- Score bars -->
+          <div class="row g-2">
+            {% for label, key, color in [
+              ('Skills','skills_match','#0D9488'),
+              ('Experience','experience','#7C3AED'),
+              ('Projects','projects','#F59E0B'),
+              ('CGPA','cgpa','#F97316'),
+            ] %}
+            <div class="col-6 col-md-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span style="font-size:.7rem;color:var(--slate-l);">{{ label }}</span>
+                <span style="font-size:.7rem;font-weight:600;color:{{ color }};">{{ mr.component_scores[key]|int }}%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" style="width:{{ mr.component_scores[key] }}%;background:{{ color }};"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- XAI Explanation -->
+          <div class="xai-box mt-3">
+            <div class="fw-semibold mb-1" style="font-size:.82rem;color:#065F46;">
+              <i class="fas fa-lightbulb me-1"></i>Why ranked #{{ rank }}: {{ exp.verdict }}
+            </div>
+            <div class="row g-1 mt-1">
+              <div class="col-md-4">
+                {% if exp.strengths %}
+                <div style="font-size:.75rem;color:#065F46;font-weight:600;">Strengths:</div>
+                {% for s in exp.strengths %}
+                <div style="font-size:.73rem;color:#047857;">✓ {{ s }}</div>
+                {% endfor %}
+                {% endif %}
+              </div>
+              <div class="col-md-4">
+                {% if exp.weaknesses %}
+                <div style="font-size:.75rem;color:#991B1B;font-weight:600;">Gaps:</div>
+                {% for w in exp.weaknesses %}
+                <div style="font-size:.73rem;color:#B91C1C;">✗ {{ w }}</div>
+                {% endfor %}
+                {% endif %}
+              </div>
+              <div class="col-md-4">
+                {% if exp.highlights %}
+                <div style="font-size:.75rem;color:#92400E;font-weight:600;">Highlights:</div>
+                {% for h in exp.highlights %}
+                <div style="font-size:.73rem;color:#B45309;">★ {{ h }}</div>
+                {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right badges -->
+        <div class="col-md-2 mt-3 mt-md-0 text-md-end">
+          <div class="mb-2">
+            <div style="font-size:.7rem;color:var(--slate-l);">Growth</div>
+            <span class="badge bg-{{ gr.color }}" style="font-size:.75rem;">{{ gr.score }}/100</span>
+            <div style="font-size:.68rem;color:var(--slate-l);">{{ gr.tier }}</div>
+          </div>
+          <div class="mb-2">
+            <div style="font-size:.7rem;color:var(--slate-l);">Bias</div>
+            <span class="bias-badge bg-{{ bs.color }} text-white">{{ bs.level }}</span>
+          </div>
+          <div class="mb-3">
+            <div style="font-size:.7rem;color:var(--slate-l);">Fraud Risk</div>
+            <span class="bias-badge bg-{{ fr.color }} text-white">{{ fr.risk_level }}</span>
+          </div>
+          <a href="{{ url_for('main.candidate_detail', rank=rank) }}" class="btn btn-sm w-100" style="background:var(--navy);color:#fff;border-radius:6px;">
+            <i class="fas fa-eye me-1"></i>Full Report
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const scores = {{ ranked | map(attribute='match_result.overall_score') | list | tojson }};
+const names  = {{ ranked | map(attribute='parsed_resume.name') | list | tojson }};
+const labels = names.map((n, i) => `#${i+1} ${n.length > 12 ? n.substring(0,12)+'...' : n}`);
+const colors = scores.map(s => s >= 70 ? '#0D9488' : (s >= 50 ? '#F59E0B' : '#F97316'));
+
+new Chart(document.getElementById('scoreChart'), {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'Match Score',
+      data: scores,
+      backgroundColor: colors,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, max: 100, grid: { color: '#F1F5F9' } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+</script>
+{% endblock %}
